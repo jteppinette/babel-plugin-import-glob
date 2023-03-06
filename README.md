@@ -1,144 +1,126 @@
-# babel-plugin-import-glob
+# Babel Plugin Import Glob
 
-Babel plugin to enable importing modules using a [glob pattern][patterns].
-Tested with Node.js 4 and above.
-
-## Installation
-
-```
-npm install --save-dev babel-plugin-import-glob
-```
-
-Then add `import-glob` to your `.babelrc` file, like:
-
-```json
-{
-  "plugins": ["import-glob"]
-}
-```
+Babel plugin to enable importing modules using glob patterns.
 
 ## Usage
 
-This plugin is useful if you have multiple modules but you don't want to import
-them one at a time.
+Given the following file structure:
 
-Maybe you're using the
-[`handlebars-inline-precompile`](https://github.com/thejameskyle/babel-plugin-handlebars-inline-precompile)
-plugin and are putting your modules in a `templates` directory. Or you need to
-dynamically reference one out of several classes and don't want to maintain the
-lookup by hand. Perhaps you need to load multiple modules for their side-effects
-and wish to simply add them to a directory without additional work. If so, this
-plugin is for you!
-
-*Of course in the vast majority of cases you should just use normal import
-statements. Don't go overboard using this plugin.*
-
-You can import the **default members** of any matching module. Let's say you
-have a directory layout like this:
-
-* `index.js`
-* `templates/main.handlebars.js`
-* `templates/_partial.handlebars.js`
-
-In `index.js` you can write:
-
-```js
-import { main, _partial } from './templates/**/*.handlebars.js'
+```txt
+├── images
+│   ├── cat.webp
+│   └── dog.webp
+└── videos
+    ├── example-1.mp4
+    └── example-2.mp4
 ```
 
-You can add an optional `glob:` prefix:
+_Simple_
 
 ```js
-import { main, _partial } from 'glob:./templates/**/*.handlebars.js'
+import { cat, dog } from './images/*.webp'
 ```
 
-You can alias members:
+_Alias_
 
 ```js
-import { main, _partial as partial } from './templates/**/*.handlebars.js'
+import { cat as c, dog as d } from './images/*.webp'
 ```
 
-Or import all matches into a namespace object:
+_Default_
 
 ```js
-import * as templates from './templates/**/*.handlebars.js'
-// Provides `templates.main` and `templates._partial`
+import videos from './videos/*.mp4'
+
+console.log(videos['example-1'])
 ```
 
-Note that you **cannot import the default** from the glob pattern. The following
-**won't work** and throws a `SyntaxError`:
+_Namespace_
 
 ```js
-import myTemplates from './templates/**/*.handlebars.js' // This will throw a SyntaxError
+import * as videos from './videos/*.mp4'
+
+console.log(videos['example-1'])
 ```
 
-You can load modules for their side-effects though:
+## Install
 
-```js
-import './modules-with-side-effects/*.js'
+```sh
+$ npm install @jteppinette/babel-plugin-import-glob
 ```
 
-### Glob patterns
+**Configuration**
 
-The plugin uses the `glob` package. Please refer to [its documentation regarding
-the pattern syntax](https://www.npmjs.com/package/glob#glob-primer).
+This plugin simply needs to be added to the Babel plugins array.
 
-The glob pattern must be relative. It must start with `./` or `../`. A
-`SyntaxError` is thrown otherwise.
+Here is a simple bare-bones babel configuration file which only supports
+this singular plugin.
 
-### Import members
+_.babelrc_
 
-Identifiers are generated for all matches using the dynamic portions of the
-pattern. File-separators in the resulting strings are replaced by dollar signs.
-The strings are then [converted into
-identifiers](https://github.com/novemberborn/identifierfy).
-
-A valid identifier cannot always be generated. If that's the case a
-`SyntaxError` is thrown with more details. Similarly multiple matches may result
-in the same identifier. This also results in a `SyntaxError` being thrown.
-
-For the `./templates/**/*.handlebars.js` example above the matches are:
-
-* `./templates/main.handlebars.js`
-* `./templates/_partial.handlebars.js`
-
-The dynamic portions are `main` and `_partial`. These are valid identifiers and
-therefore used as the import members.
-
-A `SyntaxError` is throw when importing a member that does not correspond to a
-match:
-
-```js
-import { doesNotExist } from './templates/**/*.handlebars.js' // This will throw a SyntaxError
+```json
+{
+  "plugins": ["@jteppinette/babel-plugin-import-glob"]
+}
 ```
 
-Here's an overview of how the members are determined for additional matches:
+## History
 
-Match|Result|Reason
-:---|:---|:---
-`./templates/terms-and-conditions.handlebars.js`|`termsAndConditions`|The `-` cannot be used in the identifier so it's removed. The following character is uppercased
-`./templates/blog/footer.handlebars.js`|`blog$footer`|The `blog` directory is captured by the `**` expression in the pattern. It is joined with the `footer` name using a dollar sign
-`./templates/-main.handlebars.js`|`SyntaxError`|The `-` is removed, resulting in the same identifier as for `main.handlebars.js`
-`./templates/new.handlebars.js`|`_new`|`new` is a reserved word so it's prefixed with an underscore
-`./templates/blog/new.handlebars.js`|`blog$new`|Even though `new` is a reserved word, it's combined with `blog$` so no prefix is necessary
-`./templates/404.handlebars.js`|`_404`|Identifiers can't start with digits so it's prefixed with an underscore
-`./templates/error-pages/404.handlebars.js`|`errorPages$404`|Now that `404` is combined with `errorPages$` it no longer needs to be prefixed
-`./templates/🙊.handlebars.js`|`SyntaxError`|No identifier can be generated for `🙊`
+This repo was originally forked from and inspired by [novemberborn/babel-plugin-import-glob](https://github.com/novemberborn/babel-plugin-import-glob). All license and git commits have been kept intact.
 
-Brace expansions are not considered to be a dynamic portion of the pattern.
-Given the pattern `./templates/{blog,error-pages}/*.handlebars.js`:
+The origin repo mentioned above had stagnated for many years and was missing a features that I needed:
 
-Match|Result
-:---|:---
-`./templates/blog/footer.handlebars.js`|`footer`
-`./templates/error-pages/404.handlebars.js`|`_404`
+- You could not import the default export.
+- Namespace import keys were transformed into valid identifiers instead of simply using their wildcard path names.
 
-Use [parentheses patterns][patterns] instead, e.g.
-`./templates/{@(blog),@(error-pages)}/*.handlebars.js`:
+While I do not think we would ever merge the two, I would be open to the idea.
 
-Match|Result
-:---|:---
-`./templates/blog/footer.handlebars.js`|`blog$footer`
-`./templates/error-pages/404.handlebars.js`|`errorPages$404`
+## Development
 
-[patterns]: https://www.npmjs.com/package/glob#glob-primer
+### Required Software
+
+- [direnv](https://direnv.net)
+- [git](https://git-scm.com/)
+- [nvm](https://formulae.brew.sh/formula/nvm#default)
+- [pre-commit](https://pre-commit.com/#install)
+
+### Getting Started
+
+**Setup**
+
+```sh
+$ nvm install 16
+$ direnv allow
+$ pre-commit install
+$ npm install
+```
+
+**Test**
+
+```sh
+$ npm test
+```
+
+### Publishing
+
+The publish process is automated by GitHub Actions. Once a release is
+created (at the end of these steps), the package will be published to
+the private GitHub NPM Registry.
+
+1. Bump version, commit, and tag:
+
+   ```sh
+   $ npm run version:<major|minor|patch>
+   ```
+
+2. Commit the changes, tag the commit, and push the tags:
+
+   ```sh
+   $ git push origin main --tags
+   ```
+
+3. Convert the tag to a release in GitHub.
+
+   ```sh
+   $ open "https://github.com/jteppinette/babel-plugin-import-glob/releases/new?tag=<tag>"
+   ```

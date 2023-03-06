@@ -1,50 +1,26 @@
 {
-  "name": "babel-plugin-import-glob",
-  "version": "2.0.0",
-  "description": "Babel plugin to enable importing modules using a glob pattern",
+  "name": "@jteppinette/babel-plugin-import-glob",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jteppinette/babel-plugin-import-glob.git"
+  },
+  "version": "0.0.0",
+  "main": "index.js",
   "files": [
     "index.js"
   ],
-  "engines": {
-    "node": ">=4"
-  },
   "scripts": {
-    "lint": "as-i-preach",
     "test": "ava",
-    "posttest": "as-i-preach",
-    "coverage": "nyc npm test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/novemberborn/babel-plugin-import-glob.git"
-  },
-  "author": "Mark Wubben (https://novemberborn.net/)",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/novemberborn/babel-plugin-import-glob/issues"
-  },
-  "homepage": "https://github.com/novemberborn/babel-plugin-import-glob#readme",
-  "keywords": [
-    "babel-plugin"
-  ],
-  "devDependencies": {
-    "@novemberborn/as-i-preach": "^10.1.0",
-    "ava": "^0.21.0",
-    "babel-core": "^6.4.0",
-    "codecov": "^2.1.0",
-    "nyc": "^11.0.1"
+    "version:major": "npm version major -m 'v%s'",
+    "version:minor": "npm version minor -m 'v%s'",
+    "version:patch": "npm version patch -m 'v%s'"
   },
   "dependencies": {
-    "glob": "^7.0.0",
-    "identifierfy": "^1.1.0",
-    "minimatch-capture": "^1.1.0"
+    "glob": ">=7",
+    "minimatch-capture": ">=1"
   },
-  "nyc": {
-    "reporter": [
-      "lcov",
-      "html",
-      "text"
-    ]
-  },
-  "standard-engine": "@novemberborn/as-i-preach"
+  "devDependencies": {
+    "ava": "5",
+    "babel-core": "6"
+  }
 }

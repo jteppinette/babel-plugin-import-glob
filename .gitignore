@@ -1,3 +1,9 @@
-.nyc_output
+.DS_Store
 node_modules
-/coverage
+
+# Add the following files to the allowlist
+# which supports various searching tools.
+!.envrc
+!.github
+!.gitignore
+!.pre-commit-config.yaml
