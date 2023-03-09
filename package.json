@@ -16,8 +16,8 @@
     "version:patch": "npm version patch -m 'v%s'"
   },
   "dependencies": {
-    "glob": ">=7",
-    "minimatch-capture": ">=1"
+    "glob": ">=7 <9",
+    "minimatch-capture": "1"
   },
   "devDependencies": {
     "ava": "5",
