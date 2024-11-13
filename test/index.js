@@ -19,18 +19,6 @@ function expection(expected) {
   }
 }
 
-test('throws if pattern is not relative absolute', (t) => {
-  t.throws(
-    () => transform("import { foo } from '/folder/*'"),
-    expection("Glob pattern must be relative, was '/folder/*'")
-  )
-
-  t.throws(
-    () => transform("import { foo } from 'folder/*'"),
-    expection("Glob pattern must be relative, was 'folder/*'")
-  )
-})
-
 test('skips non-glob import statements', (t) => {
   t.is(
     transform("import foo from 'fixtures/multiple/foo.txt'"),

@@ -58,10 +58,6 @@ module.exports = (core) => {
           return
         }
 
-        if (!pattern.startsWith('.')) {
-          throw error(`Glob pattern must be relative, was '${pattern}'`)
-        }
-
         const cwd = path.dirname(state.file.opts.filename)
         const members = find(cwd, pattern)
 
